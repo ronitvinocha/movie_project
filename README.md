@@ -1,2 +1,2 @@
-#Pagination with Bloc pattern
+Pagination with Bloc pattern
 
