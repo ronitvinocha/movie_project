@@ -53,4 +53,10 @@ class LocationCubit extends Cubit<List<Placemark>?> {
       addError(e, st);
     }
   }
+
+  @override
+  void onError(Object error, StackTrace stackTrace) {
+    emit([]);
+    super.onError(error, stackTrace);
+  }
 }

@@ -53,7 +53,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       BlocBuilder<LocationCubit, List<Placemark>?>(
                         builder: (context, state) {
-                          if (state != null) {
+                          if (state != null && state.isNotEmpty) {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [

@@ -51,7 +51,6 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     MovieEvent event,
     Emitter<MovieState> emit,
   ) async {
-    await Future.delayed(const Duration(seconds: 2));
     var isGetNowPlayingEvent = event is GetNowPlaying;
     var requestedMovieSubState = state.nowPlayingState;
     if (isGetNowPlayingEvent) {

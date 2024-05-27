@@ -1,4 +1,5 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -21,6 +22,8 @@ class _LoaderPageState extends State<LoaderPage>
   late Animation _animation;
   var durationInSeconds = 2;
   var pausePoint = 0.0;
+  StreamSubscription<List<Placemark>?>? locationCubitSubscription;
+  StreamSubscription<MovieState>? movieBlocSubscription;
 
   @override
   void initState() {
@@ -68,15 +71,16 @@ class _LoaderPageState extends State<LoaderPage>
   }
 
   addLocationCubitListner() {
-    context.watch<LocationCubit>().stream.listen((state) {
-      if (state != null) {
+    locationCubitSubscription =
+        context.watch<LocationCubit>().stream.listen((state) {
+      if (state != null && state.isNotEmpty) {
         _controller.forward(from: pausePoint);
       }
     });
   }
 
   addMovieBlocListner() {
-    context.watch<MovieBloc>().stream.listen((state) {
+    movieBlocSubscription = context.watch<MovieBloc>().stream.listen((state) {
       if (state.nowPlayingState.status == MovieStatus.success) {
         _controller.forward(from: pausePoint);
       }
@@ -86,6 +90,8 @@ class _LoaderPageState extends State<LoaderPage>
   @override
   void dispose() {
     _controller.dispose();
+    locationCubitSubscription?.cancel();
+    movieBlocSubscription?.cancel();
     super.dispose();
   }
 
@@ -99,41 +105,6 @@ class _LoaderPageState extends State<LoaderPage>
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-            Stack(
-              children: [
-                AnimatedBuilder(
-                    animation: _animation,
-                    builder: (context, child) {
-                      return Container(
-                        width: 150,
-                        height: 150,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(width: 2, color: Colors.black)),
-                        child: CircularProgressIndicator(
-                          strokeWidth: 4,
-                          value: _checkAnimationValue(_controller.value),
-                          color: Colors.black,
-                          semanticsLabel: 'Circular progress indicator',
-                        ),
-                      );
-                    }),
-                Positioned(
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: SvgPicture.asset(
-                    "assets/images/logo.svg",
-                    width: 25,
-                    height: 25,
-                  ),
-                )
-              ],
-            ),
-            const SizedBox(
-              height: 10,
-            ),
             BlocBuilder<LocationCubit, List<Placemark>?>(
                 builder: (context, state) {
               if (state != null && state.isEmpty) {
@@ -141,12 +112,44 @@ class _LoaderPageState extends State<LoaderPage>
                   "Need location to get movies played near you\n Please provide in setting",
                   textAlign: TextAlign.center,
                   style: GoogleFonts.lato(
-                      fontSize: 14,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500),
+                      fontSize: 18,
+                      color: Colors.red,
+                      fontWeight: FontWeight.w600),
                 );
               } else {
-                return Container();
+                return Stack(
+                  children: [
+                    AnimatedBuilder(
+                        animation: _animation,
+                        builder: (context, child) {
+                          return Container(
+                            width: 150,
+                            height: 150,
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(width: 2, color: Colors.black)),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 4,
+                              value: _checkAnimationValue(_controller.value),
+                              color: Colors.black,
+                              semanticsLabel: 'Circular progress indicator',
+                            ),
+                          );
+                        }),
+                    Positioned(
+                      top: 0,
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: SvgPicture.asset(
+                        "assets/images/logo.svg",
+                        width: 25,
+                        height: 25,
+                      ),
+                    )
+                  ],
+                );
               }
             })
           ])),
