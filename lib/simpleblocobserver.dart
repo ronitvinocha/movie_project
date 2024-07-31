@@ -11,7 +11,13 @@ class SimpleBlocObserver extends BlocObserver {
     Transition<dynamic, dynamic> transition,
   ) {
     super.onTransition(bloc, transition);
-    print(transition);
+    print("${bloc.runtimeType}->$transition");
+  }
+
+  @override
+  void onChange(BlocBase bloc, Change change) {
+    super.onChange(bloc, change);
+    print("${bloc.runtimeType}->$change");
   }
 
   @override

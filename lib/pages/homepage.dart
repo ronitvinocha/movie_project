@@ -162,6 +162,8 @@ class _HomePageState extends State<HomePage> {
     scrollController
       ..removeListener(_onScroll)
       ..dispose();
+    context.read<LocationCubit>().close();
+    context.read<MovieBloc>().close();
     super.dispose();
   }
 
